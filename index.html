@@ -4,46 +4,117 @@
   <meta charset="UTF-8">
   <title>Formulário A3</title>
   <style>
-    body { font-family: Arial; max-width: 600px; margin: 20px auto; }
-    label { font-weight: bold; margin-top: 10px; display: block; }
-    select, input, textarea { width: 100%; margin-top: 5px; padding: 8px; }
-    .hidden { display: none; }
-    button { margin-top: 15px; padding: 10px; font-size: 16px; }
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      padding: 40px 15px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 22px;
+      color: #333;
+      text-align: center;
+    }
+
+    label {
+      margin-top: 15px;
+      display: block;
+      font-weight: 600;
+      color: #444;
+    }
+
+    select, input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: border-color 0.3s;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      outline: none;
+      border-color: #0078d4;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      background: #0078d4;
+      color: white;
+      font-size: 16px;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #005ea6;
+    }
   </style>
 </head>
 <body>
 
-  <h2>Formulário Acompanhamento A3</h2>
+  <div class="card">
+    <h2>Formulário Acompanhamento A3</h2>
 
-  <form id="formA3">
+    <form id="formA3">
 
-    <label for="controle">Controle</label>
-    <select id="controle" name="controle" required>
-      <option value="">Selecione</option>
-    </select>
+      <label for="controle">Controle</label>
+      <select id="controle" name="controle" required>
+        <option value="">Selecione</option>
+      </select>
 
-    <label for="contramedida">Contramedida</label>
-    <select id="contramedida" name="contramedida" required>
-      <option value="">Selecione o controle primeiro</option>
-    </select>
+      <label for="contramedida">Contramedida</label>
+      <select id="contramedida" name="contramedida" required>
+        <option value="">Selecione o controle primeiro</option>
+      </select>
 
-    <label for="status">Status</label>
-    <select id="status" name="status" required>
-      <option value="">Selecione</option>
-      <option value="OK">OK</option>
-      <option value="NG">NG</option>
-    </select>
+      <label for="status">Status</label>
+      <select id="status" name="status" required>
+        <option value="">Selecione</option>
+        <option value="OK">OK</option>
+        <option value="NG">NG</option>
+      </select>
 
-    <div id="ngCampos" class="hidden">
-      <label for="obsNG">O que está NG?</label>
-      <textarea name="obsNG" rows="4"></textarea>
+      <div id="ngCampos" class="hidden">
+        <label for="obsNG">O que está NG?</label>
+        <textarea name="obsNG" rows="4"></textarea>
 
-      <label for="foto">Foto (opcional)</label>
-      <input type="file" name="foto" accept="image/*" capture="environment">
-    </div>
+        <label for="foto">Foto (opcional)</label>
+        <input type="file" name="foto" accept="image/*">
+      </div>
 
-    <button type="submit">Enviar</button>
-  </form>
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
 
   <script>
     const dados = {
@@ -69,7 +140,6 @@
     const statusSelect = document.getElementById("status");
     const ngCampos = document.getElementById("ngCampos");
 
-    // Popular dropdown de controle
     Object.keys(dados).forEach(controle => {
       const opt = document.createElement("option");
       opt.value = controle;
@@ -77,7 +147,6 @@
       controleSelect.appendChild(opt);
     });
 
-    // Atualizar contramedidas ao selecionar controle
     controleSelect.addEventListener("change", () => {
       const contras = dados[controleSelect.value] || [];
       contramedidaSelect.innerHTML = '<option value="">Selecione</option>';
@@ -89,12 +158,10 @@
       });
     });
 
-    // Mostrar campos NG se status for NG
     statusSelect.addEventListener("change", () => {
       ngCampos.classList.toggle("hidden", statusSelect.value !== "NG");
     });
 
-    // Submissão
     document.getElementById("formA3").addEventListener("submit", async (e) => {
       e.preventDefault();
       const form = e.target;
@@ -102,11 +169,9 @@
       formData.append("dataVerificacao", new Date().toISOString());
       formData.append("proximaVerificacao", new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString());
 
-      // Enviar para Power Automate ou outro endpoint
       await fetch("URL_DO_SEU_WEBHOOK", {
         method: "POST",
         body: formData
-        // Deixe o header como está, o browser define automaticamente para FormData
       });
 
       alert("Enviado com sucesso!");
