@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Formulário A3</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: 20px auto; }
+    label { font-weight: bold; margin-top: 10px; display: block; }
+    select, input, textarea { width: 100%; margin-top: 5px; padding: 8px; }
+    .hidden { display: none; }
+    button { margin-top: 15px; padding: 10px; font-size: 16px; }
+  </style>
+</head>
+<body>
+
+  <h2>Formulário Acompanhamento A3</h2>
+
+  <form id="formA3">
+
+    <label for="controle">Controle</label>
+    <select id="controle" name="controle" required>
+      <option value="">Selecione</option>
+    </select>
+
+    <label for="contramedida">Contramedida</label>
+    <select id="contramedida" name="contramedida" required>
+      <option value="">Selecione o controle primeiro</option>
+    </select>
+
+    <label for="local">Local</label>
+    <input type="text" name="local" required>
+
+    <label for="responsavel">Responsável</label>
+    <input type="text" name="responsavel" required>
+
+    <label for="status">Status</label>
+    <select id="status" name="status" required>
+      <option value="">Selecione</option>
+      <option value="OK">OK</option>
+      <option value="NG">NG</option>
+    </select>
+
+    <div id="ngCampos" class="hidden">
+      <label for="obsNG">O que está NG?</label>
+      <textarea name="obsNG" rows="4"></textarea>
+
+      <label for="foto">Foto (opcional)</label>
+      <input type="file" name="foto" accept="image/*">
+    </div>
+
+    <button type="submit">Enviar</button>
+  </form>
+
+  <script>
+    const dados = {
+      "A3 0011-24": [
+        "MATERIAL, MÉTODO DE FIXAÇÃO E NÚMERO DE BICOS FORAM REAVALIADOS",
+        "NOVO MÉTODO DE DIRECIONAMENTO FOI AVALIADO",
+        "CHECAGEM DO DISPOSITIVO ATUALIZADA",
+        "TREINAMENTO EVIDENCIADO",
+        "SEI ABERTA PARA INCLUSÃO DE PNP",
+        "COTAÇÃO REALIZADA"
+      ],
+      "A3 0011-25": [
+        "DESCARTE DE INSTRUMENTOS NÃO CONFORMES E OBSOLETOS",
+        "IDENTIFICAÇÃO DE ANÉIS PADRÕES DE OGIVA DE MEDIÇÃO DO VIRABREQUIM",
+        "ELABORAÇÃO DE LISTA DE INSTRUMENTOS DE MEDIÇÃO UTILIZADOS PELO OPERADOR",
+        "ABERTURA DE SEI PARA IDENTIFICAÇÃO DE Nº DE GPI EM ANÉIS PADRÃO PARA ZERAMENTO DE OGIVA",
+        "AQUISIÇÃO DE ANEL PADRÃO DE DIMENSÃO CORRETA PARA PROCESSO"
+      ]
+      // Adicione o restante dos controles aqui
+    };
+
+    const controleSelect = document.getElementById("controle");
+    const contramedidaSelect = document.getElementById("contramedida");
+    const statusSelect = document.getElementById("status");
+    const ngCampos = document.getElementById("ngCampos");
+
+    // Popular dropdown de controle
+    Object.keys(dados).forEach(controle => {
+      const opt = document.createElement("option");
+      opt.value = controle;
+      opt.textContent = controle;
+      controleSelect.appendChild(opt);
+    });
+
+    // Atualizar contramedidas ao selecionar controle
+    controleSelect.addEventListener("change", () => {
+      const contras = dados[controleSelect.value] || [];
+      contramedidaSelect.innerHTML = '<option value="">Selecione</option>';
+      contras.forEach(item => {
+        const opt = document.createElement("option");
+        opt.value = item;
+        opt.textContent = item;
+        contramedidaSelect.appendChild(opt);
+      });
+    });
+
+    // Mostrar campos NG se status for NG
+    statusSelect.addEventListener("change", () => {
+      ngCampos.classList.toggle("hidden", statusSelect.value !== "NG");
+    });
+
+    // Submissão
+    document.getElementById("formA3").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const payload = Object.fromEntries(formData.entries());
+      payload.dataVerificacao = new Date().toISOString();
+      payload.proximaVerificacao = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+      // Enviar via Power Automate webhook
+      await fetch("URL_DO_SEU_WEBHOOK", {
+        method: "POST",
+        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json" }
+      });
+
+      alert("Enviado com sucesso!");
+      e.target.reset();
+      ngCampos.classList.add("hidden");
+    });
+  </script>
+
+</body>
+</html>
