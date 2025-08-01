@@ -2,7 +2,12 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Formulário A3</title>
+  <title>Formulário A3 - Yamaha</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Ícones Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
   <style>
     * {
       box-sizing: border-box;
@@ -10,10 +15,11 @@
     }
 
     body {
-      background: #f4f6f8;
+      background: #f4f4f4;
       display: flex;
       justify-content: center;
       padding: 40px 15px;
+      transition: background 0.3s;
     }
 
     .card {
@@ -21,14 +27,16 @@
       padding: 30px;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      max-width: 500px;
+      max-width: 520px;
       width: 100%;
+      border-top: 5px solid #E60012;
+      transition: background 0.3s, color 0.3s;
     }
 
     h2 {
       margin-top: 0;
-      font-size: 22px;
-      color: #333;
+      font-size: 24px;
+      color: #E60012;
       text-align: center;
     }
 
@@ -36,7 +44,13 @@
       margin-top: 15px;
       display: block;
       font-weight: 600;
-      color: #444;
+      color: #333;
+    }
+
+    .label-icon {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     select, input, textarea {
@@ -46,12 +60,12 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 15px;
-      transition: border-color 0.3s;
+      transition: border-color 0.3s, background 0.3s, color 0.3s;
     }
 
     select:focus, input:focus, textarea:focus {
       outline: none;
-      border-color: #0078d4;
+      border-color: #E60012;
     }
 
     textarea {
@@ -62,10 +76,10 @@
       display: none;
     }
 
-    button {
+    button[type="submit"] {
       margin-top: 20px;
       width: 100%;
-      background: #0078d4;
+      background: #E60012;
       color: white;
       font-size: 16px;
       border: none;
@@ -75,29 +89,73 @@
       transition: background 0.3s;
     }
 
-    button:hover {
-      background: #005ea6;
+    button[type="submit"]:hover {
+      background: #bb000e;
+    }
+
+    .dark {
+      background: #1e1e1e;
+    }
+
+    .dark .card {
+      background: #2b2b2b;
+      color: #eee;
+    }
+
+    .dark label,
+    .dark select,
+    .dark input,
+    .dark textarea {
+      background: #444;
+      border-color: #666;
+      color: #eee;
+    }
+
+    .dark select:focus,
+    .dark input:focus,
+    .dark textarea:focus {
+      border-color: #E60012;
+    }
+
+    .icon {
+      color: #E60012;
+    }
+
+    #toggleDark {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #333;
+      float: right;
+    }
+
+    .dark #toggleDark {
+      color: #eee;
     }
   </style>
 </head>
 <body>
 
   <div class="card">
-    <h2>Formulário Acompanhamento A3</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h2><i class="fa-solid fa-motorcycle icon"></i> Formulário A3</h2>
+      <button id="toggleDark" title="Modo Claro/Escuro">🌙</button>
+    </div>
 
     <form id="formA3">
 
-      <label for="controle">Controle</label>
+      <label class="label-icon" for="controle"><i class="fa-solid fa-folder icon"></i> Controle</label>
       <select id="controle" name="controle" required>
         <option value="">Selecione</option>
       </select>
 
-      <label for="contramedida">Contramedida</label>
+      <label class="label-icon" for="contramedida"><i class="fa-solid fa-wrench icon"></i> Contramedida</label>
       <select id="contramedida" name="contramedida" required>
         <option value="">Selecione o controle primeiro</option>
       </select>
 
-      <label for="status">Status</label>
+      <label class="label-icon" for="status"><i class="fa-solid fa-triangle-exclamation icon"></i> Status</label>
       <select id="status" name="status" required>
         <option value="">Selecione</option>
         <option value="OK">OK</option>
@@ -105,14 +163,14 @@
       </select>
 
       <div id="ngCampos" class="hidden">
-        <label for="obsNG">O que está NG?</label>
+        <label class="label-icon" for="obsNG"><i class="fa-solid fa-pen-to-square icon"></i> O que está NG?</label>
         <textarea name="obsNG" rows="4"></textarea>
 
-        <label for="foto">Foto (opcional)</label>
+        <label class="label-icon" for="foto"><i class="fa-solid fa-camera icon"></i> Foto (opcional)</label>
         <input type="file" name="foto" accept="image/*">
       </div>
 
-      <button type="submit">Enviar</button>
+      <button type="submit"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
     </form>
   </div>
 
@@ -169,7 +227,7 @@
       formData.append("dataVerificacao", new Date().toISOString());
       formData.append("proximaVerificacao", new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString());
 
-      await fetch("URL_DO_SEU_WEBHOOK", {
+      await fetch("https://SEU_WEBHOOK_DO_POWER_AUTOMATE", {
         method: "POST",
         body: formData
       });
@@ -177,6 +235,10 @@
       alert("Enviado com sucesso!");
       form.reset();
       ngCampos.classList.add("hidden");
+    });
+
+    document.getElementById("toggleDark").addEventListener("click", () => {
+      document.body.classList.toggle("dark");
     });
   </script>
 
