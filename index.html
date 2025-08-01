@@ -27,12 +27,6 @@
       <option value="">Selecione o controle primeiro</option>
     </select>
 
-    <label for="local">Local</label>
-    <input type="text" name="local" required>
-
-    <label for="responsavel">Responsável</label>
-    <input type="text" name="responsavel" required>
-
     <label for="status">Status</label>
     <select id="status" name="status" required>
       <option value="">Selecione</option>
@@ -45,7 +39,7 @@
       <textarea name="obsNG" rows="4"></textarea>
 
       <label for="foto">Foto (opcional)</label>
-      <input type="file" name="foto" accept="image/*">
+      <input type="file" name="foto" accept="image/*" capture="environment">
     </div>
 
     <button type="submit">Enviar</button>
@@ -68,7 +62,6 @@
         "ABERTURA DE SEI PARA IDENTIFICAÇÃO DE Nº DE GPI EM ANÉIS PADRÃO PARA ZERAMENTO DE OGIVA",
         "AQUISIÇÃO DE ANEL PADRÃO DE DIMENSÃO CORRETA PARA PROCESSO"
       ]
-      // Adicione o restante dos controles aqui
     };
 
     const controleSelect = document.getElementById("controle");
@@ -104,21 +97,20 @@
     // Submissão
     document.getElementById("formA3").addEventListener("submit", async (e) => {
       e.preventDefault();
-      
-      const formData = new FormData(e.target);
-      const payload = Object.fromEntries(formData.entries());
-      payload.dataVerificacao = new Date().toISOString();
-      payload.proximaVerificacao = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      const form = e.target;
+      const formData = new FormData(form);
+      formData.append("dataVerificacao", new Date().toISOString());
+      formData.append("proximaVerificacao", new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString());
 
-      // Enviar via Power Automate webhook
+      // Enviar para Power Automate ou outro endpoint
       await fetch("URL_DO_SEU_WEBHOOK", {
         method: "POST",
-        body: JSON.stringify(payload),
-        headers: { "Content-Type": "application/json" }
+        body: formData
+        // Deixe o header como está, o browser define automaticamente para FormData
       });
 
       alert("Enviado com sucesso!");
-      e.target.reset();
+      form.reset();
       ngCampos.classList.add("hidden");
     });
   </script>
