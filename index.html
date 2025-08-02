@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Formulário A3 - Yamaha</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
 
   <style>
     :root {
       --yamaha-blue: #003366;
-      --yamaha-blue-hover: #0055A4;
-      --yamaha-red: #D00000;
+      --yamaha-blue-hover: #0055a4;
+      --yamaha-red: #d00000;
       --bg-light: #ffffff;
       --bg-dark: #121212;
       --text-light: #f0f0f0;
@@ -37,7 +40,8 @@
       background-color: var(--bg-light);
       color: var(--text-dark);
     }
-    body.light h2, body.light label {
+    body.light h2,
+    body.light label {
       color: var(--yamaha-blue);
     }
 
@@ -50,32 +54,42 @@
       background-color: #1e1e1e;
       color: var(--text-light);
     }
-    body.dark h2, body.dark label {
+    body.dark h2,
+    body.dark label {
       color: var(--text-light);
     }
 
-    /* Botão de tema */
+    /* Botão de tema compacto */
     .theme-toggle {
       position: fixed;
       top: 15px;
       right: 15px;
-      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      font-size: 22px;
       background: none;
       border: none;
       cursor: pointer;
       color: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border-radius: 50%;
       transition: transform 0.2s;
+      z-index: 1000;
     }
     .theme-toggle:hover {
       transform: scale(1.1);
     }
 
+    /* Container geral */
     .container {
       max-width: 500px;
-      margin: 0 auto;
+      margin: 60px auto 0; /* deixa espaço para o botão de tema */
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       text-align: center;
     }
 
@@ -97,7 +111,10 @@
       text-align: left;
     }
 
-    select, input[type="text"], textarea, input[type="file"] {
+    select,
+    input[type='text'],
+    textarea,
+    input[type='file'] {
       width: 100%;
       margin-top: 5px;
       padding: 12px;
@@ -108,13 +125,15 @@
       transition: box-shadow 0.3s;
     }
 
-    select:focus, input:focus, textarea:focus {
+    select:focus,
+    input:focus,
+    textarea:focus {
       border-color: var(--yamaha-blue);
       outline: none;
       box-shadow: 0 0 6px rgba(0, 51, 102, 0.5);
     }
 
-    button {
+    button[type='submit'] {
       margin-top: 20px;
       padding: 14px;
       width: 100%;
@@ -128,8 +147,14 @@
       transition: background 0.3s;
     }
 
-    button:hover { background-color: var(--yamaha-blue-hover); }
-    button.loading { opacity: 0.7; cursor: not-allowed; }
+    button[type='submit']:hover {
+      background-color: var(--yamaha-blue-hover);
+    }
+
+    button.loading {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
 
     .preview {
       margin-top: 10px;
@@ -148,24 +173,37 @@
       display: none;
     }
 
-    .success { background: var(--success); color: white; }
-    .error { background: var(--error); color: white; }
+    .success {
+      background: var(--success);
+      color: white;
+    }
+
+    .error {
+      background: var(--error);
+      color: white;
+    }
 
     @media (max-width: 600px) {
-      .container { padding: 15px; border-radius: 8px; }
-      button { font-size: 16px; padding: 12px; }
+      .container {
+        padding: 15px;
+        border-radius: 8px;
+      }
+      button[type='submit'] {
+        font-size: 16px;
+        padding: 12px;
+      }
     }
   </style>
 </head>
 <body>
   <!-- Botão de alternar tema -->
-  <button id="themeToggle" class="theme-toggle">
+  <button id="themeToggle" class="theme-toggle" aria-label="Alternar tema">
     <i id="themeIcon" class="fas fa-moon"></i>
   </button>
 
   <div class="container">
-    <!-- Logo Yamaha -->
-    <img src="assets/logo.png" alt="Yamaha Logo" class="logo">
+    <!-- Logo Yamaha (coloque sua imagem na pasta assets e ajuste o caminho) -->
+    <img src="assets/logo.png" alt="Yamaha Logo" class="logo" />
 
     <h2><i class="fas fa-clipboard-check"></i> Acompanhamento A3</h2>
 
@@ -187,16 +225,24 @@
         <option value="NG">NG</option>
       </select>
 
-      <div id="ngCampos" style="display:none;">
+      <div id="ngCampos" style="display: none">
         <label for="obsNG"><i class="fas fa-exclamation-triangle"></i> O que está NG?</label>
         <textarea name="obsNG" rows="4"></textarea>
 
         <label for="foto"><i class="fas fa-camera"></i> Foto (opcional)</label>
-        <input type="file" name="foto" id="foto" accept="image/*" capture="environment">
+        <input
+          type="file"
+          name="foto"
+          id="foto"
+          accept="image/*"
+          capture="environment"
+        />
         <img id="preview" class="preview" />
       </div>
 
-      <button type="submit" id="submitBtn"><i class="fas fa-paper-plane"></i> Enviar</button>
+      <button type="submit" id="submitBtn">
+        <i class="fas fa-paper-plane"></i> Enviar
+      </button>
     </form>
 
     <div id="mensagem" class="message"></div>
@@ -212,6 +258,7 @@
     function applyTheme(theme) {
       body.classList.remove('light', 'dark');
       body.classList.add(theme);
+      // Ícone mostra o oposto do tema atual para indicar o que vai ativar no clique
       themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
     }
 
@@ -229,46 +276,46 @@
 
     // Dados do formulário
     const dados = {
-      "A3 0011-24": [
-        "MATERIAL, MÉTODO DE FIXAÇÃO E NÚMERO DE BICOS FORAM REAVALIADOS",
-        "NOVO MÉTODO DE DIRECIONAMENTO FOI AVALIADO",
-        "CHECAGEM DO DISPOSITIVO ATUALIZADA",
-        "TREINAMENTO EVIDENCIADO",
-        "SEI ABERTA PARA INCLUSÃO DE PNP",
-        "COTAÇÃO REALIZADA"
+      'A3 0011-24': [
+        'MATERIAL, MÉTODO DE FIXAÇÃO E NÚMERO DE BICOS FORAM REAVALIADOS',
+        'NOVO MÉTODO DE DIRECIONAMENTO FOI AVALIADO',
+        'CHECAGEM DO DISPOSITIVO ATUALIZADA',
+        'TREINAMENTO EVIDENCIADO',
+        'SEI ABERTA PARA INCLUSÃO DE PNP',
+        'COTAÇÃO REALIZADA',
       ],
-      "A3 0011-25": [
-        "DESCARTE DE INSTRUMENTOS NÃO CONFORMES E OBSOLETOS",
-        "IDENTIFICAÇÃO DE ANÉIS PADRÕES DE OGIVA DE MEDIÇÃO DO VIRABREQUIM",
-        "ELABORAÇÃO DE LISTA DE INSTRUMENTOS DE MEDIÇÃO UTILIZADOS PELO OPERADOR",
-        "ABERTURA DE SEI PARA IDENTIFICAÇÃO DE Nº DE GPI EM ANÉIS PADRÃO PARA ZERAMENTO DE OGIVA",
-        "AQUISIÇÃO DE ANEL PADRÃO DE DIMENSÃO CORRETA PARA PROCESSO"
-      ]
+      'A3 0011-25': [
+        'DESCARTE DE INSTRUMENTOS NÃO CONFORMES E OBSOLETOS',
+        'IDENTIFICAÇÃO DE ANÉIS PADRÕES DE OGIVA DE MEDIÇÃO DO VIRABREQUIM',
+        'ELABORAÇÃO DE LISTA DE INSTRUMENTOS DE MEDIÇÃO UTILIZADOS PELO OPERADOR',
+        'ABERTURA DE SEI PARA IDENTIFICAÇÃO DE Nº DE GPI EM ANÉIS PADRÃO PARA ZERAMENTO DE OGIVA',
+        'AQUISIÇÃO DE ANEL PADRÃO DE DIMENSÃO CORRETA PARA PROCESSO',
+      ],
     };
 
-    const controleSelect = document.getElementById("controle");
-    const contramedidaSelect = document.getElementById("contramedida");
-    const statusSelect = document.getElementById("status");
-    const ngCampos = document.getElementById("ngCampos");
-    const preview = document.getElementById("preview");
-    const fotoInput = document.getElementById("foto");
-    const mensagem = document.getElementById("mensagem");
-    const submitBtn = document.getElementById("submitBtn");
+    const controleSelect = document.getElementById('controle');
+    const contramedidaSelect = document.getElementById('contramedida');
+    const statusSelect = document.getElementById('status');
+    const ngCampos = document.getElementById('ngCampos');
+    const preview = document.getElementById('preview');
+    const fotoInput = document.getElementById('foto');
+    const mensagem = document.getElementById('mensagem');
+    const submitBtn = document.getElementById('submitBtn');
 
     // Preenche dropdown de controle
-    Object.keys(dados).forEach(controle => {
-      const opt = document.createElement("option");
+    Object.keys(dados).forEach((controle) => {
+      const opt = document.createElement('option');
       opt.value = controle;
       opt.textContent = controle;
       controleSelect.appendChild(opt);
     });
 
     // Atualiza contramedidas
-    controleSelect.addEventListener("change", () => {
+    controleSelect.addEventListener('change', () => {
       const contras = dados[controleSelect.value] || [];
       contramedidaSelect.innerHTML = '<option value="">Selecione</option>';
-      contras.forEach(item => {
-        const opt = document.createElement("option");
+      contras.forEach((item) => {
+        const opt = document.createElement('option');
         opt.value = item;
         opt.textContent = item;
         contramedidaSelect.appendChild(opt);
@@ -276,39 +323,41 @@
     });
 
     // Mostra campos NG
-    statusSelect.addEventListener("change", () => {
-      ngCampos.style.display = (statusSelect.value === "NG") ? "block" : "none";
+    statusSelect.addEventListener('change', () => {
+      ngCampos.style.display = statusSelect.value === 'NG' ? 'block' : 'none';
     });
 
     // Preview da imagem
-    fotoInput.addEventListener("change", () => {
+    fotoInput.addEventListener('change', () => {
       const file = fotoInput.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = e => {
+        reader.onload = (e) => {
           preview.src = e.target.result;
-          preview.style.display = "block";
+          preview.style.display = 'block';
         };
         reader.readAsDataURL(file);
       } else {
-        preview.style.display = "none";
+        preview.style.display = 'none';
       }
     });
 
     // Envio do formulário
-    document.getElementById("formA3").addEventListener("submit", async (e) => {
+    document.getElementById('formA3').addEventListener('submit', async (e) => {
       e.preventDefault();
-      submitBtn.classList.add("loading");
+      submitBtn.classList.add('loading');
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
       const formData = new FormData(e.target);
       const payload = Object.fromEntries(formData.entries());
       payload.dataVerificacao = new Date().toISOString();
-      payload.proximaVerificacao = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      payload.proximaVerificacao = new Date(
+        Date.now() + 30 * 24 * 60 * 60 * 1000
+      ).toISOString();
 
       if (fotoInput.files[0]) {
         const reader = new FileReader();
-        reader.onload = async e => {
+        reader.onload = async (e) => {
           payload.foto = e.target.result;
           await enviarDados(payload);
         };
@@ -320,38 +369,36 @@
 
     async function enviarDados(payload) {
       try {
-        await fetch("URL_DO_SEU_WEBHOOK", {
-          method: "POST",
+        await fetch('URL_DO_SEU_WEBHOOK', {
+          method: 'POST',
           body: JSON.stringify(payload),
-          headers: { "Content-Type": "application/json" }
+          headers: { 'Content-Type': 'application/json' },
         });
 
         // Mostra mensagem de sucesso
-        mensagem.textContent = "Enviado com sucesso!";
-        mensagem.className = "message success";
-        mensagem.style.display = "block";
+        mensagem.textContent = 'Enviado com sucesso!';
+        mensagem.className = 'message success';
+        mensagem.style.display = 'block';
 
         // Reseta o formulário
-        document.getElementById("formA3").reset();
-        preview.style.display = "none";
-        ngCampos.style.display = "none";
+        document.getElementById('formA3').reset();
+        preview.style.display = 'none';
+        ngCampos.style.display = 'none';
 
         // Some depois de 3 segundos
         setTimeout(() => {
-          mensagem.style.display = "none";
+          mensagem.style.display = 'none';
         }, 3000);
-
       } catch (error) {
-        mensagem.textContent = "Erro ao enviar!";
-        mensagem.className = "message error";
-        mensagem.style.display = "block";
+        mensagem.textContent = 'Erro ao enviar!';
+        mensagem.className = 'message error';
+        mensagem.style.display = 'block';
 
         setTimeout(() => {
-          mensagem.style.display = "none";
+          mensagem.style.display = 'none';
         }, 3000);
-
       } finally {
-        submitBtn.classList.remove("loading");
+        submitBtn.classList.remove('loading');
         submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar';
       }
     }
