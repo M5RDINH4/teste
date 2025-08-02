@@ -12,26 +12,40 @@
   <style>
     :root {
       --yamaha-blue: #003366;
-      --text-light: #f0f0f0;
-      --text-dark: #1a1a1a;
+      --accent: #007acc;
+      --success: #28a745;
+      --error: #dc3545;
       --bg-light: #ffffff;
       --bg-dark: #121212;
-      --accent: #007acc;
+      --text-light: #f0f0f0;
+      --text-dark: #1a1a1a;
     }
 
     body {
       font-family: 'Segoe UI', sans-serif;
-      max-width: 600px;
-      margin: 0 auto;
+      margin: 0;
       padding: 20px;
-      background-color: var(--bg-light);
-      color: var(--text-dark);
-      transition: all 0.3s ease;
+      transition: background 0.3s, color 0.3s;
     }
 
-    body.dark {
-      background-color: var(--bg-dark);
-      color: var(--text-light);
+    /* Tema claro/escuro automático */
+    @media (prefers-color-scheme: dark) {
+      body { background-color: var(--bg-dark); color: var(--text-light); }
+      .container { background-color: #1e1e1e; color: var(--text-light); }
+    }
+
+    @media (prefers-color-scheme: light) {
+      body { background-color: var(--bg-light); color: var(--text-dark); }
+      .container { background-color: var(--bg-light); color: var(--text-dark); }
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
     }
 
     h2 {
@@ -48,79 +62,103 @@
     select, input[type="text"], textarea, input[type="file"] {
       width: 100%;
       margin-top: 5px;
-      padding: 10px;
-      border-radius: 5px;
+      padding: 12px;
+      border-radius: 8px;
       border: 1px solid #ccc;
+      font-size: 16px;
       box-sizing: border-box;
+      transition: box-shadow 0.3s;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 6px rgba(0, 122, 204, 0.5);
     }
 
     button {
       margin-top: 20px;
-      padding: 12px;
+      padding: 14px;
       width: 100%;
       background-color: var(--yamaha-blue);
       color: white;
-      font-size: 16px;
+      font-size: 18px;
+      font-weight: bold;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: background 0.3s;
     }
 
-    button:hover {
-      background-color: var(--accent);
-    }
+    button:hover { background-color: var(--accent); }
+    button.loading { opacity: 0.7; cursor: not-allowed; }
 
-    .hidden {
+    .hidden { display: none; }
+    .fade { transition: opacity 0.3s; opacity: 0; }
+    .fade.show { opacity: 1; }
+
+    .preview {
+      margin-top: 10px;
+      max-height: 150px;
+      border-radius: 8px;
+      object-fit: cover;
       display: none;
     }
 
-    .toggle-dark {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      cursor: pointer;
-      font-size: 20px;
+    .message {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .success { background: var(--success); color: white; }
+    .error { background: var(--error); color: white; }
+
+    /* Responsividade */
+    @media (max-width: 600px) {
+      .container { padding: 15px; border-radius: 8px; }
+      button { font-size: 16px; padding: 12px; }
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h2><i class="fas fa-clipboard-check"></i> Acompanhamento A3</h2>
 
-  <!-- Botão dark mode -->
-  <div class="toggle-dark" onclick="document.body.classList.toggle('dark')">
-    <i class="fas fa-moon"></i>
+    <form id="formA3">
+      <label for="controle"><i class="fas fa-list"></i> Controle</label>
+      <select id="controle" name="controle" required>
+        <option value="">Selecione</option>
+      </select>
+
+      <label for="contramedida"><i class="fas fa-wrench"></i> Contramedida</label>
+      <select id="contramedida" name="contramedida" required>
+        <option value="">Selecione o controle primeiro</option>
+      </select>
+
+      <label for="status"><i class="fas fa-flag"></i> Status</label>
+      <select id="status" name="status" required>
+        <option value="">Selecione</option>
+        <option value="OK">OK</option>
+        <option value="NG">NG</option>
+      </select>
+
+      <div id="ngCampos" class="fade">
+        <label for="obsNG"><i class="fas fa-exclamation-triangle"></i> O que está NG?</label>
+        <textarea name="obsNG" rows="4"></textarea>
+
+        <label for="foto"><i class="fas fa-camera"></i> Foto (opcional)</label>
+        <input type="file" name="foto" id="foto" accept="image/*" capture="environment">
+        <img id="preview" class="preview" />
+      </div>
+
+      <button type="submit" id="submitBtn"><i class="fas fa-paper-plane"></i> Enviar</button>
+    </form>
+
+    <div id="mensagem" class="message hidden"></div>
   </div>
-
-  <h2><i class="fas fa-clipboard-check"></i> Acompanhamento A3</h2>
-
-  <form id="formA3">
-
-    <label for="controle"><i class="fas fa-list"></i> Controle</label>
-    <select id="controle" name="controle" required>
-      <option value="">Selecione</option>
-    </select>
-
-    <label for="contramedida"><i class="fas fa-wrench"></i> Contramedida</label>
-    <select id="contramedida" name="contramedida" required>
-      <option value="">Selecione o controle primeiro</option>
-    </select>
-
-    <label for="status"><i class="fas fa-flag"></i> Status</label>
-    <select id="status" name="status" required>
-      <option value="">Selecione</option>
-      <option value="OK">OK</option>
-      <option value="NG">NG</option>
-    </select>
-
-    <div id="ngCampos" class="hidden">
-      <label for="obsNG"><i class="fas fa-exclamation-triangle"></i> O que está NG?</label>
-      <textarea name="obsNG" rows="4"></textarea>
-
-      <label for="foto"><i class="fas fa-camera"></i> Foto (opcional)</label>
-      <input type="file" name="foto" accept="image/*" capture="environment">
-    </div>
-
-    <button type="submit"><i class="fas fa-paper-plane"></i> Enviar</button>
-  </form>
 
   <script>
     const dados = {
@@ -145,7 +183,12 @@
     const contramedidaSelect = document.getElementById("contramedida");
     const statusSelect = document.getElementById("status");
     const ngCampos = document.getElementById("ngCampos");
+    const preview = document.getElementById("preview");
+    const fotoInput = document.getElementById("foto");
+    const mensagem = document.getElementById("mensagem");
+    const submitBtn = document.getElementById("submitBtn");
 
+    // Popular dropdown principal
     Object.keys(dados).forEach(controle => {
       const opt = document.createElement("option");
       opt.value = controle;
@@ -153,6 +196,7 @@
       controleSelect.appendChild(opt);
     });
 
+    // Atualizar contramedidas
     controleSelect.addEventListener("change", () => {
       const contras = dados[controleSelect.value] || [];
       contramedidaSelect.innerHTML = '<option value="">Selecione</option>';
@@ -164,30 +208,77 @@
       });
     });
 
+    // Mostrar campos NG
     statusSelect.addEventListener("change", () => {
-      ngCampos.classList.toggle("hidden", statusSelect.value !== "NG");
+      if (statusSelect.value === "NG") {
+        ngCampos.classList.add("show");
+        ngCampos.style.opacity = "1";
+      } else {
+        ngCampos.style.opacity = "0";
+        setTimeout(() => ngCampos.classList.remove("show"), 300);
+      }
     });
 
+    // Preview da imagem
+    fotoInput.addEventListener("change", () => {
+      const file = fotoInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          preview.src = e.target.result;
+          preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.style.display = "none";
+      }
+    });
+
+    // Envio do formulário
     document.getElementById("formA3").addEventListener("submit", async (e) => {
       e.preventDefault();
-      
+      submitBtn.classList.add("loading");
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
       const formData = new FormData(e.target);
       const payload = Object.fromEntries(formData.entries());
       payload.dataVerificacao = new Date().toISOString();
       payload.proximaVerificacao = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-      // Substitua pela URL do Power Automate
-      await fetch("URL_DO_SEU_WEBHOOK", {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: { "Content-Type": "application/json" }
-      });
-
-      alert("Enviado com sucesso!");
-      e.target.reset();
-      ngCampos.classList.add("hidden");
+      if (fotoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = async e => {
+          payload.foto = e.target.result;
+          await enviarDados(payload);
+        };
+        reader.readAsDataURL(fotoInput.files[0]);
+      } else {
+        await enviarDados(payload);
+      }
     });
-  </script>
 
+    async function enviarDados(payload) {
+      try {
+        await fetch("URL_DO_SEU_WEBHOOK", {
+          method: "POST",
+          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" }
+        });
+
+        mensagem.textContent = "Enviado com sucesso!";
+        mensagem.className = "message success";
+        mensagem.classList.remove("hidden");
+        document.getElementById("formA3").reset();
+        preview.style.display = "none";
+      } catch (error) {
+        mensagem.textContent = "Erro ao enviar!";
+        mensagem.className = "message error";
+        mensagem.classList.remove("hidden");
+      } finally {
+        submitBtn.classList.remove("loading");
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar';
+      }
+    }
+  </script>
 </body>
 </html>
