@@ -54,6 +54,22 @@
       color: var(--text-light);
     }
 
+    /* Botão de tema */
+    .theme-toggle {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: inherit;
+      transition: transform 0.2s;
+    }
+    .theme-toggle:hover {
+      transform: scale(1.1);
+    }
+
     .container {
       max-width: 500px;
       margin: 0 auto;
@@ -115,29 +131,6 @@
     button:hover { background-color: var(--yamaha-blue-hover); }
     button.loading { opacity: 0.7; cursor: not-allowed; }
 
-    .theme-toggle {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    .theme-toggle button {
-      width: auto;
-      padding: 8px 12px;
-      font-size: 14px;
-      background-color: var(--yamaha-blue);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .theme-toggle button:hover {
-      background-color: var(--yamaha-blue-hover);
-    }
-
     .preview {
       margin-top: 10px;
       max-height: 150px;
@@ -152,7 +145,7 @@
       border-radius: 8px;
       font-weight: bold;
       text-align: center;
-      display: none; /* Sempre escondida por padrão */
+      display: none;
     }
 
     .success { background: var(--success); color: white; }
@@ -165,16 +158,14 @@
   </style>
 </head>
 <body>
+  <!-- Botão de alternar tema -->
+  <button id="themeToggle" class="theme-toggle">
+    <i id="themeIcon" class="fas fa-moon"></i>
+  </button>
+
   <div class="container">
     <!-- Logo Yamaha -->
     <img src="assets/logo.png" alt="Yamaha Logo" class="logo">
-
-    <!-- Botões de tema -->
-    <div class="theme-toggle">
-      <button id="lightBtn"><i class="fas fa-sun"></i> Claro</button>
-      <button id="darkBtn"><i class="fas fa-moon"></i> Escuro</button>
-      <button id="autoBtn"><i class="fas fa-adjust"></i> Automático</button>
-    </div>
 
     <h2><i class="fas fa-clipboard-check"></i> Acompanhamento A3</h2>
 
@@ -212,24 +203,31 @@
   </div>
 
   <script>
-    // Detecta tema inicial baseado no sistema
+    // Detecta tema inicial (automático)
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.body.classList.add(prefersDark ? 'dark' : 'light');
+    const savedTheme = localStorage.getItem('theme');
+    const body = document.body;
+    const themeIcon = document.getElementById('themeIcon');
 
-    // Botões de troca de tema
-    document.getElementById("lightBtn").addEventListener("click", () => {
-      document.body.classList.remove("dark");
-      document.body.classList.add("light");
-    });
-    document.getElementById("darkBtn").addEventListener("click", () => {
-      document.body.classList.remove("light");
-      document.body.classList.add("dark");
-    });
-    document.getElementById("autoBtn").addEventListener("click", () => {
-      document.body.classList.remove("light", "dark");
-      document.body.classList.add(prefersDark ? "dark" : "light");
+    function applyTheme(theme) {
+      body.classList.remove('light', 'dark');
+      body.classList.add(theme);
+      themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+
+    if (savedTheme) {
+      applyTheme(savedTheme);
+    } else {
+      applyTheme(prefersDark ? 'dark' : 'light');
+    }
+
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const newTheme = body.classList.contains('dark') ? 'light' : 'dark';
+      applyTheme(newTheme);
+      localStorage.setItem('theme', newTheme);
     });
 
+    // Dados do formulário
     const dados = {
       "A3 0011-24": [
         "MATERIAL, MÉTODO DE FIXAÇÃO E NÚMERO DE BICOS FORAM REAVALIADOS",
