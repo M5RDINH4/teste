@@ -2,23 +2,23 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Formulário A3</title>
+  <title>Formulário A3 - Yamaha</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- Estilo -->
   <style>
     :root {
       --yamaha-blue: #003366;
-      --accent: #007acc;
-      --success: #28a745;
-      --error: #dc3545;
+      --yamaha-blue-hover: #0055A4;
+      --yamaha-red: #D00000;
       --bg-light: #ffffff;
       --bg-dark: #121212;
       --text-light: #f0f0f0;
       --text-dark: #1a1a1a;
+      --success: #28a745;
+      --error: #dc3545;
     }
 
     body {
@@ -32,11 +32,13 @@
     @media (prefers-color-scheme: dark) {
       body { background-color: var(--bg-dark); color: var(--text-light); }
       .container { background-color: #1e1e1e; color: var(--text-light); }
+      h2, label { color: var(--text-light); }
     }
 
     @media (prefers-color-scheme: light) {
       body { background-color: var(--bg-light); color: var(--text-dark); }
       .container { background-color: var(--bg-light); color: var(--text-dark); }
+      h2, label { color: var(--yamaha-blue); }
     }
 
     .container {
@@ -45,18 +47,25 @@
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      transition: transform 0.3s;
+      text-align: center;
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 15px;
     }
 
     h2 {
-      text-align: center;
-      color: var(--yamaha-blue);
+      margin: 10px 0;
+      font-size: 22px;
+      font-weight: bold;
     }
 
     label {
       font-weight: bold;
       margin-top: 15px;
       display: block;
+      text-align: left;
     }
 
     select, input[type="text"], textarea, input[type="file"] {
@@ -71,9 +80,9 @@
     }
 
     select:focus, input:focus, textarea:focus {
-      border-color: var(--accent);
+      border-color: var(--yamaha-blue);
       outline: none;
-      box-shadow: 0 0 6px rgba(0, 122, 204, 0.5);
+      box-shadow: 0 0 6px rgba(0, 51, 102, 0.5);
     }
 
     button {
@@ -90,12 +99,8 @@
       transition: background 0.3s;
     }
 
-    button:hover { background-color: var(--accent); }
+    button:hover { background-color: var(--yamaha-blue-hover); }
     button.loading { opacity: 0.7; cursor: not-allowed; }
-
-    .hidden { display: none; }
-    .fade { transition: opacity 0.3s; opacity: 0; }
-    .fade.show { opacity: 1; }
 
     .preview {
       margin-top: 10px;
@@ -116,7 +121,6 @@
     .success { background: var(--success); color: white; }
     .error { background: var(--error); color: white; }
 
-    /* Responsividade */
     @media (max-width: 600px) {
       .container { padding: 15px; border-radius: 8px; }
       button { font-size: 16px; padding: 12px; }
@@ -125,6 +129,7 @@
 </head>
 <body>
   <div class="container">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Yamaha_Motor_Logo.svg" alt="Yamaha Logo" class="logo">
     <h2><i class="fas fa-clipboard-check"></i> Acompanhamento A3</h2>
 
     <form id="formA3">
@@ -145,7 +150,7 @@
         <option value="NG">NG</option>
       </select>
 
-      <div id="ngCampos" class="fade">
+      <div id="ngCampos" style="display:none;">
         <label for="obsNG"><i class="fas fa-exclamation-triangle"></i> O que está NG?</label>
         <textarea name="obsNG" rows="4"></textarea>
 
@@ -210,13 +215,7 @@
 
     // Mostrar campos NG
     statusSelect.addEventListener("change", () => {
-      if (statusSelect.value === "NG") {
-        ngCampos.classList.add("show");
-        ngCampos.style.opacity = "1";
-      } else {
-        ngCampos.style.opacity = "0";
-        setTimeout(() => ngCampos.classList.remove("show"), 300);
-      }
+      ngCampos.style.display = (statusSelect.value === "NG") ? "block" : "none";
     });
 
     // Preview da imagem
@@ -264,7 +263,6 @@
           body: JSON.stringify(payload),
           headers: { "Content-Type": "application/json" }
         });
-
         mensagem.textContent = "Enviado com sucesso!";
         mensagem.className = "message success";
         mensagem.classList.remove("hidden");
