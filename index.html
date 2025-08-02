@@ -5,9 +5,9 @@
   <title>Formulário A3 - Yamaha</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Font Awesome -->
+  <!-- Font Awesome para ícones -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
+
   <style>
     :root {
       --yamaha-blue: #003366;
@@ -52,7 +52,7 @@
 
     .logo {
       width: 120px;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
 
     h2 {
@@ -129,7 +129,9 @@
 </head>
 <body>
   <div class="container">
+    <!-- Logo Yamaha -->
     <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Yamaha_Motor_Logo.svg" alt="Yamaha Logo" class="logo">
+    
     <h2><i class="fas fa-clipboard-check"></i> Acompanhamento A3</h2>
 
     <form id="formA3">
@@ -193,7 +195,7 @@
     const mensagem = document.getElementById("mensagem");
     const submitBtn = document.getElementById("submitBtn");
 
-    // Popular dropdown principal
+    // Preenche o dropdown de controle
     Object.keys(dados).forEach(controle => {
       const opt = document.createElement("option");
       opt.value = controle;
@@ -201,7 +203,7 @@
       controleSelect.appendChild(opt);
     });
 
-    // Atualizar contramedidas
+    // Atualiza contramedidas conforme controle selecionado
     controleSelect.addEventListener("change", () => {
       const contras = dados[controleSelect.value] || [];
       contramedidaSelect.innerHTML = '<option value="">Selecione</option>';
@@ -213,7 +215,7 @@
       });
     });
 
-    // Mostrar campos NG
+    // Mostra/oculta campos NG
     statusSelect.addEventListener("change", () => {
       ngCampos.style.display = (statusSelect.value === "NG") ? "block" : "none";
     });
@@ -263,15 +265,30 @@
           body: JSON.stringify(payload),
           headers: { "Content-Type": "application/json" }
         });
+
         mensagem.textContent = "Enviado com sucesso!";
         mensagem.className = "message success";
         mensagem.classList.remove("hidden");
+
+        // Reseta o formulário e oculta tudo
         document.getElementById("formA3").reset();
         preview.style.display = "none";
+        ngCampos.style.display = "none";
+
+        // Remove a mensagem depois de 3s
+        setTimeout(() => {
+          mensagem.classList.add("hidden");
+        }, 3000);
+
       } catch (error) {
         mensagem.textContent = "Erro ao enviar!";
         mensagem.className = "message error";
         mensagem.classList.remove("hidden");
+
+        setTimeout(() => {
+          mensagem.classList.add("hidden");
+        }, 3000);
+
       } finally {
         submitBtn.classList.remove("loading");
         submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar';
