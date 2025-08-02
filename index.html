@@ -5,7 +5,7 @@
   <title>Formulário A3 - Yamaha</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Font Awesome para ícones -->
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
@@ -28,17 +28,30 @@
       transition: background 0.3s, color 0.3s;
     }
 
-    /* Tema claro/escuro automático */
-    @media (prefers-color-scheme: dark) {
-      body { background-color: var(--bg-dark); color: var(--text-light); }
-      .container { background-color: #1e1e1e; color: var(--text-light); }
-      h2, label { color: var(--text-light); }
+    /* Tema claro */
+    body.light {
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+    }
+    body.light .container {
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+    }
+    body.light h2, body.light label {
+      color: var(--yamaha-blue);
     }
 
-    @media (prefers-color-scheme: light) {
-      body { background-color: var(--bg-light); color: var(--text-dark); }
-      .container { background-color: var(--bg-light); color: var(--text-dark); }
-      h2, label { color: var(--yamaha-blue); }
+    /* Tema escuro */
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+    }
+    body.dark .container {
+      background-color: #1e1e1e;
+      color: var(--text-light);
+    }
+    body.dark h2, body.dark label {
+      color: var(--text-light);
     }
 
     .container {
@@ -102,6 +115,29 @@
     button:hover { background-color: var(--yamaha-blue-hover); }
     button.loading { opacity: 0.7; cursor: not-allowed; }
 
+    .theme-toggle {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .theme-toggle button {
+      width: auto;
+      padding: 8px 12px;
+      font-size: 14px;
+      background-color: var(--yamaha-blue);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .theme-toggle button:hover {
+      background-color: var(--yamaha-blue-hover);
+    }
+
     .preview {
       margin-top: 10px;
       max-height: 150px;
@@ -116,6 +152,7 @@
       border-radius: 8px;
       font-weight: bold;
       text-align: center;
+      display: none; /* Sempre escondida por padrão */
     }
 
     .success { background: var(--success); color: white; }
@@ -130,8 +167,15 @@
 <body>
   <div class="container">
     <!-- Logo Yamaha -->
-    <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Yamaha_Motor_Logo.svg" alt="Yamaha Logo" class="logo">
-    
+    <img src="assets/logo.png" alt="Yamaha Logo" class="logo">
+
+    <!-- Botões de tema -->
+    <div class="theme-toggle">
+      <button id="lightBtn"><i class="fas fa-sun"></i> Claro</button>
+      <button id="darkBtn"><i class="fas fa-moon"></i> Escuro</button>
+      <button id="autoBtn"><i class="fas fa-adjust"></i> Automático</button>
+    </div>
+
     <h2><i class="fas fa-clipboard-check"></i> Acompanhamento A3</h2>
 
     <form id="formA3">
@@ -164,10 +208,28 @@
       <button type="submit" id="submitBtn"><i class="fas fa-paper-plane"></i> Enviar</button>
     </form>
 
-    <div id="mensagem" class="message hidden"></div>
+    <div id="mensagem" class="message"></div>
   </div>
 
   <script>
+    // Detecta tema inicial baseado no sistema
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.body.classList.add(prefersDark ? 'dark' : 'light');
+
+    // Botões de troca de tema
+    document.getElementById("lightBtn").addEventListener("click", () => {
+      document.body.classList.remove("dark");
+      document.body.classList.add("light");
+    });
+    document.getElementById("darkBtn").addEventListener("click", () => {
+      document.body.classList.remove("light");
+      document.body.classList.add("dark");
+    });
+    document.getElementById("autoBtn").addEventListener("click", () => {
+      document.body.classList.remove("light", "dark");
+      document.body.classList.add(prefersDark ? "dark" : "light");
+    });
+
     const dados = {
       "A3 0011-24": [
         "MATERIAL, MÉTODO DE FIXAÇÃO E NÚMERO DE BICOS FORAM REAVALIADOS",
@@ -195,7 +257,7 @@
     const mensagem = document.getElementById("mensagem");
     const submitBtn = document.getElementById("submitBtn");
 
-    // Preenche o dropdown de controle
+    // Preenche dropdown de controle
     Object.keys(dados).forEach(controle => {
       const opt = document.createElement("option");
       opt.value = controle;
@@ -203,7 +265,7 @@
       controleSelect.appendChild(opt);
     });
 
-    // Atualiza contramedidas conforme controle selecionado
+    // Atualiza contramedidas
     controleSelect.addEventListener("change", () => {
       const contras = dados[controleSelect.value] || [];
       contramedidaSelect.innerHTML = '<option value="">Selecione</option>';
@@ -215,7 +277,7 @@
       });
     });
 
-    // Mostra/oculta campos NG
+    // Mostra campos NG
     statusSelect.addEventListener("change", () => {
       ngCampos.style.display = (statusSelect.value === "NG") ? "block" : "none";
     });
@@ -266,27 +328,28 @@
           headers: { "Content-Type": "application/json" }
         });
 
+        // Mostra mensagem de sucesso
         mensagem.textContent = "Enviado com sucesso!";
         mensagem.className = "message success";
-        mensagem.classList.remove("hidden");
+        mensagem.style.display = "block";
 
-        // Reseta o formulário e oculta tudo
+        // Reseta o formulário
         document.getElementById("formA3").reset();
         preview.style.display = "none";
         ngCampos.style.display = "none";
 
-        // Remove a mensagem depois de 3s
+        // Some depois de 3 segundos
         setTimeout(() => {
-          mensagem.classList.add("hidden");
+          mensagem.style.display = "none";
         }, 3000);
 
       } catch (error) {
         mensagem.textContent = "Erro ao enviar!";
         mensagem.className = "message error";
-        mensagem.classList.remove("hidden");
+        mensagem.style.display = "block";
 
         setTimeout(() => {
-          mensagem.classList.add("hidden");
+          mensagem.style.display = "none";
         }, 3000);
 
       } finally {
