@@ -207,7 +207,21 @@
 
     <h2><i class="fas fa-clipboard-check"></i> Acompanhamento A3</h2>
 
-    <form id="formA3">
+    <form
+      id="formA3"
+      name="formA3"
+      method="POST"
+      data-netlify="true"
+      enctype="multipart/form-data"
+      netlify-honeypot="bot-field"
+      action="/obrigado.html"
+    >
+      <!-- Campo honeypot para bots -->
+      <input type="hidden" name="form-name" value="formA3" />
+      <p style="display:none;">
+        <label>Não preencher <input name="bot-field" /></label>
+      </p>
+
       <label for="controle"><i class="fas fa-list"></i> Controle</label>
       <select id="controle" name="controle" required>
         <option value="">Selecione</option>
@@ -240,6 +254,10 @@
         <img id="preview" class="preview" />
       </div>
 
+      <!-- Campos ocultos para datas automáticas -->
+      <input type="hidden" name="dataVerificacao" id="dataVerificacao" />
+      <input type="hidden" name="proximaVerificacao" id="proximaVerificacao" />
+
       <button type="submit" id="submitBtn">
         <i class="fas fa-paper-plane"></i> Enviar
       </button>
@@ -249,7 +267,7 @@
   </div>
 
   <script>
-    // Detecta tema inicial (automático)
+    // Tema
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const savedTheme = localStorage.getItem('theme');
     const body = document.body;
@@ -258,7 +276,6 @@
     function applyTheme(theme) {
       body.classList.remove('light', 'dark');
       body.classList.add(theme);
-      // Ícone mostra o oposto do tema atual para indicar o que vai ativar no clique
       themeIcon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
     }
 
@@ -342,70 +359,20 @@
       }
     });
 
-    // Envio do formulário
-    document.getElementById('formA3').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    // Adiciona datas automáticas antes do submit
+    document.getElementById('formA3').addEventListener('submit', (e) => {
+      // dataVerificacao = agora
+      document.getElementById('dataVerificacao').value = new Date().toISOString();
+      // proximaVerificacao = +30 dias
+      const proxima = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      document.getElementById('proximaVerificacao').value = proxima.toISOString();
+
+      // Mostra loading no botão (visual)
       submitBtn.classList.add('loading');
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-
-      const formData = new FormData(e.target);
-      const payload = Object.fromEntries(formData.entries());
-      payload.dataVerificacao = new Date().toISOString();
-      payload.proximaVerificacao = new Date(
-        Date.now() + 30 * 24 * 60 * 60 * 1000
-      ).toISOString();
-
-      if (fotoInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          payload.foto = e.target.result;
-          await enviarDados(payload);
-        };
-        reader.readAsDataURL(fotoInput.files[0]);
-      } else {
-        await enviarDados(payload);
-      }
     });
 
-    async function enviarDados(payload) {
-      try {
-        await fetch('https://prod-33.japaneast.logic.azure.com:443/workflows/d0ba5925f4ed40719393ef2bb924bfc3/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=MD7TIn7muWr3GGAye9MFXN3bkP36HMo_Z-V5OybPtRA', {
-          method: 'POST',
-          body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'application/json' },
-        });
-
-        // Mostra mensagem de sucesso
-        mensagem.textContent = 'Enviado com sucesso!';
-        mensagem.className = 'message success';
-        mensagem.style.display = 'block';
-
-        // Reseta o formulário
-        document.getElementById('formA3').reset();
-        preview.style.display = 'none';
-        ngCampos.style.display = 'none';
-
-        // Some depois de 3 segundos
-        setTimeout(() => {
-          mensagem.style.display = 'none';
-        }, 3000);
-      } catch (error) {
-        mensagem.textContent = 'Erro ao enviar!';
-        mensagem.className = 'message error';
-        mensagem.style.display = 'block';
-
-        setTimeout(() => {
-          mensagem.style.display = 'none';
-        }, 3000);
-      } finally {
-        submitBtn.classList.remove('loading');
-        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar';
-      }
-    }
+    // Como o Netlify redireciona para página de sucesso, o reset e mensagem você pode colocar na thank you page.
   </script>
 </body>
 </html>
-
-
-
-
